@@ -71,7 +71,7 @@ class sarcasm_model():
 
         model.add(Dense(int(hidden_units / 2), kernel_initializer='he_normal', activation='relu'))
         model.add(Dropout(0.5))
-
+        model.add(Flatten())
         model.add(Dense(2, activation='softmax'))
 
         adam = Adam(lr=0.001)
@@ -308,14 +308,14 @@ if __name__ == "__main__":
     vocab_file_path = basepath + '/resource/text_model_2D/vocab_list.txt'
 
     # word2vec path
-    word2vec_path = '/home/ubuntu/word2vec/GoogleNews-vectors-negative300.bin'
-    glove_path = '/home/striker/word2vec/glove_model_200.txt.bin'
+    word2vec_path = basepath + '/resource/GoogleNews-vectors-negative300.bin'
+    # glove_path = '/home/striker/word2vec/glove_model_200.txt.bin'
 
     # test file is passed to build the vocabulary
-    # tr = train_model(train_file, validation_file, word_file_path, split_word_path, emoji_file_path, model_file,
-    #                  vocab_file_path, output_file,
-    #                  word2vec_path=glove_path, test_file=test_file)
-    #
+    tr = train_model(train_file, validation_file, word_file_path, split_word_path, emoji_file_path, model_file,
+                     vocab_file_path, output_file,
+                     word2vec_path=word2vec_path, test_file=test_file)
+   
     t = test_model(model_file, word_file_path, split_word_path, emoji_file_path, vocab_file_path, output_file)
     t.load_trained_model()
     t.predict(test_file)
