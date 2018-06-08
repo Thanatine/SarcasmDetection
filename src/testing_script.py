@@ -21,6 +21,8 @@ from keras.utils import np_utils
 from collections import defaultdict
 import src.data_processing.data_handler as dh
 
+import argparse
+
 class sarcasm_model():
     _train_file = None
     _test_file = None
@@ -206,10 +208,25 @@ if __name__ == "__main__":
     CNN_LSTM_word2vec_path = '/resource/text_model_word2vec/'
     CNN_DNN_path = '/resource/text_model_2D/'
 
-    output_file = basepath + CNN_LSTM_path + 'TestResults.txt'
-    model_file = basepath + CNN_LSTM_path + 'weights/'
-    vocab_file_path = basepath + CNN_LSTM_path + 'vocab_list.txt'
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('which_model', metavar='N', type=int, nargs='?', const=1, 
+                        help='indicate which model, 1: CNN_LSTM, 2: CNN_LSTM_simpler, 3: CNN_LSTM_word2vec, 4: CNN_DNN')
 
+    args = parser.parse_args()
+
+    which_path = None
+    if args.which_model == 1:
+        which_path = CNN_LSTM_path
+    elif args.which_model == 2:
+        which_path = CNN_LSTM_simpler_path
+    elif args.which_model == 3:
+        which_path = CNN_LSTM_word2vec_path
+    elif args.which_model == 4:
+        which_path = CNN_DNN_path
+
+    output_file = basepath + which_path + 'TestResults.txt'
+    model_file = basepath + which_path + 'weights/'
+    vocab_file_path = basepath + which_path + 'vocab_list.txt'
 
     t = test_model(model_file, word_file_path, split_word_path, emoji_file_path, vocab_file_path, output_file)
     t.load_trained_model(weight_file='model.json.hdf5')

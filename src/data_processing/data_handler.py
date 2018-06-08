@@ -305,6 +305,60 @@ def parsedata(lines, word_list, split_word_list, emoji_dict, abbreviation_dict, 
     print('')
     return data
 
+def parse_sent(sent, word_file_path, split_word_path, emoji_file_path, vocab,
+              normalize_text=False,
+              split_hashtag=False,
+              ignore_profiles=False, 
+              lowercase=False, replace_emoji=True, n_grams=None, at_character=False):
+
+    target_text = TweetTokenizer().tokenize(sent.strip())
+    if (at_character):
+        target_text = [c for c in sent.strip()]
+
+    if (n_grams != None):
+        n_grams_list = list(create_ngram_set(target_text, ngram_value=n_grams))
+        target_text.extend(['_'.join(n) for n in n_grams_list])
+
+    word_list = None
+    emoji_dict = None
+
+    # load split files
+    split_word_list = load_split_word(split_word_path)
+
+    # load word dictionary
+    if (split_hashtag):
+        word_list = InitializeWords(word_file_path)
+
+    if (replace_emoji):
+        emoji_dict = load_unicode_mapping(emoji_file_path)
+    abbreviation_dict = load_abbreviation()
+
+    # filter text
+    target_text = filter_text(target_text, word_list, split_word_list, emoji_dict, abbreviation_dict,
+                                normalize_text,
+                                split_hashtag,
+                                ignore_profiles, replace_emoji=replace_emoji)
+
+    known_words_set = set()
+    unknown_words_set = set()
+
+    tokens = 0
+    token_coverage = 0
+    vec = []
+
+    # tweet
+    for words in target_text:
+        tokens = tokens + 1
+        if words in vocab:
+            vec.append(vocab[words])
+            token_coverage = token_coverage + 1
+            known_words_set.add(words)
+        else:
+            vec.append(vocab['unk'])
+            unknown_words_set.add(words)
+
+    return numpy.asarray([vec])
+
 
 def loaddata(filename, word_file_path, split_word_path, emoji_file_path, normalize_text=False, split_hashtag=False,
              ignore_profiles=False,
